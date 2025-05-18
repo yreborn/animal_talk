@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动物语言交流</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Comic Sans MS", "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #ffefd5;
+            color: #5d4037;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #ff6d00;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header p {
+            color: #8d6e63;
+            font-size: 1.2rem;
+        }
+        
+        .pet-selector {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .pet-card {
+            width: 120px;
+            height: 150px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid transparent;
+        }
+        
+        .pet-card.active {
+            border-color: #ff6d00;
+            transform: translateY(-5px);
+        }
+        
+        .pet-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .pet-card:hover img {
+            transform: scale(1.1);
+        }
+        
+        .pet-card p {
+            font-weight: bold;
+            color: #5d4037;
+        }
+        
+        .action-selector {
+            background-color: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .action-title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #ff6d00;
+            font-size: 1.5rem;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-btn {
+            background-color: #ffecb3;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #5d4037;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .action-btn:hover {
+            background-color: #ffe082;
+            transform: translateY(-2px);
+        }
+        
+        .action-btn.active {
+            background-color: #ffd54f;
+            box-shadow: 0 4px 8px rgba(255, 109, 0, 0.3);
+        }
+        
+        .action-btn img {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+        }
+        
+        .result-section {
+            background-color: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .result-title {
+            color: #ff6d00;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .result-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .result-image {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+        
+        .result-text {
+            font-size: 1.2rem;
+            color: #5d4037;
+            margin-bottom: 20px;
+        }
+        
+        .sound-bubble {
+            background-color: #e3f2fd;
+            border-radius: 20px;
+            padding: 15px 25px;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            position: relative;
+            max-width: 80%;
+        }
+        
+        .sound-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: #e3f2fd transparent transparent;
+        }
+        
+        .play-btn {
+            background-color: #ff6d00;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(255, 109, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .play-btn:hover {
+            background-color: #f57c00;
+            transform: translateY(-2px);
+        }
+        
+        .play-btn:active {
+            transform: translateY(0);
+        }
+        
+        .play-btn i {
+            font-size: 1.5rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .paw-print {
+            position: absolute;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .bounce {
+            animation: bounce 0.5s;
+        }
+        
+        @media (max-width: 600px) {
+            .pet-selector {
+                gap: 10px;
+            }
+            
+            .pet-card {
+                width: 100px;
+                height: 130px;
+            }
+            
+            .pet-card img {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .action-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐾 动物语言交流 🐾</h1>
+            <p>选择一个小动物，让它做出各种动作吧！</p>
+        </div>
+        
+        <div class="pet-selector">
+            <div class="pet-card" data-pet="cat">
+                <img src="https://cdn-icons-png.flaticon.com/512/616/616430.png" alt="猫">
+                <p>猫咪</p>
+            </div>
+            <div class="pet-card" data-pet="dog">
+                <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="狗">
+                <p>狗狗</p>
+            </div>
+            <div class="pet-card" data-pet="bird">
+                <img src="https://cdn-icons-png.flaticon.com/512/616/616439.png" alt="鸟">
+                <p>小鸟</p>
+            </div>
+            <div class="pet-card" data-pet="rabbit">
+                <img src="https://cdn-icons-png.flaticon.com/512/616/616419.png" alt="兔子">
+                <p>兔子</p>
+            </div>
+        </div>
+        
+        <div class="action-selector">
+            <h2 class="action-title">选择动作</h2>
+            <div class="action-grid">
+                <button class="action-btn" data-action="sit">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2829/2829758.png" alt="坐下">
+                    坐下
+                </button>
+                <button class="action-btn" data-action="eat">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1046/1046857.png" alt="吃饭">
+                    吃饭
+                </button>
+                <button class="action-btn" data-action="sleep">
+                    <img src="https://cdn-icons-png.flaticon.com/512/995/995719.png" alt="睡觉">
+                    睡觉
+                </button>
+                <button class="action-btn" data-action="run">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2548/2548374.png" alt="跑步">
+                    跑步
+                </button>
+                <button class="action-btn" data-action="play">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3460/3460335.png" alt="玩耍">
+                    玩耍
+                </button>
+                <button class="action-btn" data-action="happy">
+                    <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png" alt="开心">
+                    开心
+                </button>
+            </div>
+        </div>
+        
+        <div class="result-section hidden" id="result">
+            <h2 class="result-title">动物反应</h2>
+            <div class="result-content">
+                <img src="" alt="动物反应" class="result-image" id="result-image">
+                <div class="sound-bubble" id="sound-text"></div>
+                <p class="result-text" id="result-description"></p>
+                <button class="play-btn" id="play-btn">
+                    <span>播放声音</span>
+                    <span>🔊</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 变量初始化
+            let selectedPet = null;
+            let selectedAction = null;
+            
+            // 检查浏览器是否支持语音合成
+            const synth = window.speechSynthesis;
+            const isSpeechSupported = synth !== undefined;
+            
+            // 动物数据
+            const pets = {
+                cat: {
+                    name: "猫咪",
+                    image: "https://cdn-icons-png.flaticon.com/512/616/616430.png",
+                    actions: {
+                        sit: {
+                            sound: "喵~",
+                            description: "猫咪优雅地坐下了，尾巴轻轻摆动",
+                            audioText: "喵"
+                        },
+                        eat: {
+                            sound: "咕噜咕噜~",
+                            description: "猫咪开心地吃着美食，发出满足的声音",
+                            audioText: "咕噜咕噜 喵"
+                        },
+                        sleep: {
+                            sound: "呼噜呼噜~",
+                            description: "猫咪蜷缩成一团，安静地睡着了",
+                            audioText: "呼噜呼噜"
+                        },
+                        run: {
+                            sound: "喵喵喵！",
+                            description: "猫咪飞快地奔跑着，像一道闪电",
+                            audioText: "喵喵喵"
+                        },
+                        play: {
+                            sound: "喵~喵~",
+                            description: "猫咪玩得很开心，追逐着玩具",
+                            audioText: "喵 喵"
+                        },
+                        happy: {
+                            sound: "咕噜咕噜喵~",
+                            description: "猫咪非常开心，蹭着你的腿",
+                            audioText: "咕噜咕噜 喵"
+                        }
+                    }
+                },
+                dog: {
+                    name: "狗狗",
+                    image: "https://cdn-icons-png.flaticon.com/512/616/616408.png",
+                    actions: {
+                        sit: {
+                            sound: "汪！",
+                            description: "狗狗乖乖地坐下了，等待你的下一个指令",
+                            audioText: "汪"
+                        },
+                        eat: {
+                            sound: "呜呜呜~",
+                            description: "狗狗狼吞虎咽地吃着食物，尾巴摇个不停",
+                            audioText: "呜呜呜"
+                        },
+                        sleep: {
+                            sound: "呼噜呼噜~",
+                            description: "狗狗躺下来，进入了甜蜜的梦乡",
+                            audioText: "呼噜呼噜"
+                        },
+                        run: {
+                            sound: "汪汪汪！",
+                            description: "狗狗兴奋地奔跑着，充满了活力",
+                            audioText: "汪汪汪"
+                        },
+                        play: {
+                            sound: "汪汪！",
+                            description: "狗狗开心地玩耍，不停地摇尾巴",
+                            audioText: "汪汪"
+                        },
+                        happy: {
+                            sound: "汪汪汪~",
+                            description: "狗狗高兴地围着你转圈，想要你的抚摸",
+                            audioText: "汪汪汪"
+                        }
+                    }
+                },
+                bird: {
+                    name: "小鸟",
+                    image: "https://cdn-icons-png.flaticon.com/512/616/616439.png",
+                    actions: {
+                        sit: {
+                            sound: "啾啾~",
+                            description: "小鸟停在树枝上，轻轻摇晃",
+                            audioText: "啾啾"
+                        },
+                        eat: {
+                            sound: "啾啾啾~",
+                            description: "小鸟啄食着小米，非常可爱",
+                            audioText: "啾啾啾"
+                        },
+                        sleep: {
+                            sound: "...",
+                            description: "小鸟把头埋在翅膀下，安静地睡着了",
+                            audioText: "啾"
+                        },
+                        run: {
+                            sound: "啾！啾！",
+                            description: "小鸟在空中飞翔，自由自在",
+                            audioText: "啾 啾"
+                        },
+                        play: {
+                            sound: "啾啾啾~",
+                            description: "小鸟在玩耍，跳来跳去",
+                            audioText: "啾啾啾"
+                        },
+                        happy: {
+                            sound: "啾啾啾啾~",
+                            description: "小鸟开心地唱着歌，好像在表达感谢",
+                            audioText: "啾啾啾啾"
+                        }
+                    }
+                },
+                rabbit: {
+                    name: "兔子",
+                    image: "https://cdn-icons-png.flaticon.com/512/616/616419.png",
+                    actions: {
+                        sit: {
+                            sound: "...",
+                            description: "兔子安静地坐着，耳朵竖起来警惕四周",
+                            audioText: "吱"
+                        },
+                        eat: {
+                            sound: "咔嚓咔嚓~",
+                            description: "兔子开心地啃着胡萝卜，小嘴不停动",
+                            audioText: "咔嚓咔嚓"
+                        },
+                        sleep: {
+                            sound: "...",
+                            description: "兔子蜷缩成一团，安静地睡着了",
+                            audioText: "吱"
+                        },
+                        run: {
+                            sound: "噗噗噗~",
+                            description: "兔子飞快地跳跃着，像一团白色的云",
+                            audioText: "噗噗噗"
+                        },
+                        play: {
+                            sound: "吱吱~",
+                            description: "兔子开心地玩耍，蹦蹦跳跳",
+                            audioText: "吱吱"
+                        },
+                        happy: {
+                            sound: "吱吱吱~",
+                            description: "兔子非常开心，在你周围蹦跳",
+                            audioText: "吱吱吱"
+                        }
+                    }
+                }
+            };
+            
+            // 选择宠物
+            const petCards = document.querySelectorAll('.pet-card');
+            petCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // 移除之前的选择
+                    petCards.forEach(c => c.classList.remove('active'));
+                    
+                    // 添加新的选择
+                    this.classList.add('active');
+                    selectedPet = this.getAttribute('data-pet');
+                    
+                    // 如果已经选择了动作，则更新结果
+                    if (selectedAction) {
+                        updateResult();
+                    }
+                    
+                    // 添加动画效果
+                    this.classList.add('bounce');
+                    setTimeout(() => {
+                        this.classList.remove('bounce');
+                    }, 500);
+                });
+            });
+            
+            // 选择动作
+            const actionBtns = document.querySelectorAll('.action-btn');
+            actionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 如果没有选择宠物，提示用户
+                    if (!selectedPet) {
+                        alert('请先选择一个小动物！');
+                        return;
+                    }
+                    
+                    // 移除之前的选择
+                    actionBtns.forEach(b => b.classList.remove('active'));
+                    
+                    // 添加新的选择
+                    this.classList.add('active');
+                    selectedAction = this.getAttribute('data-action');
+                    
+                    // 更新结果
+                    updateResult();
+                    
+                    // 添加动画效果
+                    this.classList.add('bounce');
+                    setTimeout(() => {
+                        this.classList.remove('bounce');
+                    }, 500);
+                });
+            });
+            
+            // 播放声音按钮
+            const playBtn = document.getElementById('play-btn');
+            playBtn.addEventListener('click', function() {
+                if (selectedPet && selectedAction) {
+                    playSound();
+                    
+                    // 添加动画效果
+                    this.classList.add('bounce');
+                    setTimeout(() => {
+                        this.classList.remove('bounce');
+                    }, 500);
+                }
+            });
+            
+            // 更新结果区域
+            function updateResult() {
+                if (!selectedPet || !selectedAction) return;
+                
+                const pet = pets[selectedPet];
+                const action = pet.actions[selectedAction];
+                
+                // 更新图片
+                const resultImage = document.getElementById('result-image');
+                resultImage.src = pet.image;
+                resultImage.alt = pet.name;
+                
+                // 更新声音文本
+                document.getElementById('sound-text').textContent = action.sound;
+                
+                // 更新描述
+                document.getElementById('result-description').textContent = action.description;
+                
+                // 显示结果区域
+                document.getElementById('result').classList.remove('hidden');
+            }
+            
+            // 播放声音
+            function playSound() {
+                if (!selectedPet || !selectedAction || !isSpeechSupported) return;
+                
+                const pet = pets[selectedPet];
+                const action = pet.actions[selectedAction];
+                
+                // 停止之前的语音
+                synth.cancel();
+                
+                // 创建语音对象
+                const utterance = new SpeechSynthesisUtterance(action.audioText);
+                
+                // 设置语音参数
+                utterance.lang = 'zh-CN';
+                utterance.pitch = 1.5; // 音调
+                utterance.rate = 1.0;  // 语速
+                
+                // 根据动物类型调整音调和语速
+                switch(selectedPet) {
+                    case 'cat':
+                        utterance.pitch = 2.0;
+                        utterance.rate = 1.2;
+                        break;
+                    case 'dog':
+                        utterance.pitch = 0.8;
+                        utterance.rate = 1.0;
+                        break;
+                    case 'bird':
+                        utterance.pitch = 2.5;
+                        utterance.rate = 1.5;
+                        break;
+                    case 'rabbit':
+                        utterance.pitch = 1.8;
+                        utterance.rate = 1.3;
+                        break;
+                }
+                
+                // 播放声音
+                synth.speak(utterance);
+            }
+            
+            // 添加装饰性爪印
+            function addPawPrints() {
+                const container = document.querySelector('.container');
+                const pawColors = ['#ff6d00', '#8d6e63', '#5d4037'];
+                
+                for (let i = 0; i < 10; i++) {
+                    const paw = document.createElement('div');
+                    paw.classList.add('paw-print');
+                    paw.innerHTML = '🐾';
+                    paw.style.fontSize = Math.random() * 20 + 20 + 'px';
+                    paw.style.color = pawColors[Math.floor(Math.random() * pawColors.length)];
+                    paw.style.left = Math.random() * 100 + '%';
+                    paw.style.top = Math.random() * 100 + '%';
+                    paw.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    container.appendChild(paw);
+                }
+            }
+            
+            // 添加爪印装饰
+            addPawPrints();
+            
+            // 如果不支持语音合成，显示提示
+            if (!isSpeechSupported) {
+                alert('您的浏览器不支持语音合成功能，无法播放声音。');
+                document.getElementById('play-btn').disabled = true;
+                document.getElementById('play-btn').textContent = '您的浏览器不支持声音播放';
+            }
+        });
+    </script>
+</body>
+</html>
